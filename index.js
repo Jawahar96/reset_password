@@ -96,7 +96,7 @@ app.get('/user/:id', authenticate ,async function(req,res){
 })
 
 // Edit the user
-app.put('/user/:id', async function(req,res){
+app.put('/user/:id',  authenticate ,async function(req,res){
     try{
     const connection =  await mongoClient.connect(url)
     const db =connection.db(DB)
@@ -111,7 +111,7 @@ app.put('/user/:id', async function(req,res){
 })
 
 // delete the user
-app.delete('/userdelete', async function(req,res){
+app.delete('/userdelete',  authenticate ,async function(req,res){
     try{
     const connection =  await mongoClient.connect(url)
     const db =connection.db(DB)
