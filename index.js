@@ -9,25 +9,33 @@ const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
 
+
 const mongoClient = mongodb.MongoClient
 
 const dotenv =require('dotenv').config()
-
-const url =process.env.DB
+const url =('mongodb+srv://jawaharsabesan:nSXzTEgQPK8wYv6k@cluster0.n6dtkg8.mongodb.net/?retryWrites=true&w=majority')
+// const url =process.env.DB
 
 const PORT = process.env.PORT || 3002
-
+const cors =require('cors')
 const DB= "resetpassword"
-
+ 
+const corsOption ={
+    origin :    "http://localhost:3000"
+}
 // miidleware
 app.use(express.json())
+
+
+
 let authenticate = (req,res,next)=>{
    
     if(req.header.authorization){
+        next()
     try{
-    const valid = jwt.verify(req.header.authorization,process.env.SECRET);
-    console.log(valid);
-    if(valid){
+    const decode= jwt.verify(req.header.authorization,process.env.SECRET);
+   
+    if(decode){
         next()
     
 }
@@ -153,11 +161,13 @@ app.post('/login',async function(req,res){
   if(users){
    let compare = await bcrypt.compare(req.body.password,users.password)
    if(compare){
-   const  token = jwt.sign({_id : users._id},process.env.SECRET,{expiresIn : "5m"});
+        const  token = jwt.sign({_id : users._id},process.env.SECRET,{expiresIn : "15m"})  
+       res.json(token)
+       console.log(token)
 
-   res.json({token})
-   
+
 }else{
+    
     res.json({message : "Login credential failed"})
 }
   }
@@ -165,9 +175,10 @@ app.post('/login',async function(req,res){
    
     res.status(401).json({message : "Username/password is wrong "})
   }
-
+await connection.close();
     }catch(error){
-        console.log(error);
+       
+        res.status(500).json({message : "Somethiing went wrong"})
     }
 })
 
